@@ -1,0 +1,15 @@
+{
+  "name": "ved-oidc",
+  "version": "1.0.0",
+  "description": "This is an OpenID Connection built by Ved to solve the problem of Asymmetric Authentication and Authorization",
+  "keywords": [
+    "oidc"
+  ],
+  "license": "ISC",
+  "author": "Ved Pandey",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
