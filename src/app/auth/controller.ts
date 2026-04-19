@@ -4,8 +4,10 @@ import { signinPayloadModel, signupPayloadModel } from "./models.js";
 import { db } from "../../db/index.js";
 import { usersTable } from "../../db/schema.js";
 import { eq } from "drizzle-orm";
-import { createUserToken } from "./utils/token.js";
+import jwt from "jsonwebtoken";
 import type { UserTokenPayload } from "./utils/token.js";
+
+const authCodes = new Map<string, any>();
 
 class AuthenticationController {
   public async handleSignup(req: Request, res: Response) {
@@ -79,9 +81,16 @@ class AuthenticationController {
         .status(400)
         .json({ message: `email or password is incorrect` });
 
-    const token = createUserToken({ id: userSelect.id });
+    const code = randomBytes(16).toString("hex");
 
-    return res.json({ message: "Signin Success", data: { token } });
+    authCodes.set(code, {
+      id: userSelect.id,
+      firstName: userSelect.firstName,
+      lastName: userSelect.lastName,
+      expiresAt: Date.now() + 5 * 60 * 1000,
+    });
+
+    return res.json({ code });
   }
 
   public async handleMe(req: Request, res: Response) {
@@ -98,6 +107,53 @@ class AuthenticationController {
       lastName: userResult?.lastName,
       email: userResult?.email,
     });
+  }
+
+  public async handleToken(req: Request, res: Response) {
+    const { code } = req.body;
+
+    if (!authCodes.has(code)) {
+      return res.status(400).json({ error: "Invalid code" });
+    }
+
+    const user = authCodes.get(code);
+
+    if (Date.now() > user.expiresAt) {
+      authCodes.delete(code);
+      return res.status(400).json({ error: "Code expired" });
+    }
+
+    authCodes.delete(code);
+
+    const issuer = `${req.protocol}://${req.get("host")}`;
+
+    const id_token = jwt.sign(
+      {
+        sub: user.id,
+        name: `${user.firstName} ${user.lastName}`,
+        iss: issuer,
+        aud: "client_id",
+        iat: Math.floor(Date.now() / 1000),
+      },
+      "secret",
+      { expiresIn: "1h" },
+    );
+
+    const access_token = jwt.sign({ id: user.id }, "secret", {
+      expiresIn: "1h",
+    });
+
+    return res.json({
+      access_token,
+      id_token,
+      token_type: "Bearer",
+    });
+  }
+
+  public async JWKSHandler(req: Request, res: Response) {
+    return res.json({
+      keys: []
+    })
   }
 }
 

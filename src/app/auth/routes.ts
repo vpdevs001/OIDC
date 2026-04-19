@@ -21,3 +21,11 @@ authRouter.get(
   restrictToAuthenticatedUser(),
   authenticationController.handleMe.bind(authenticationController),
 );
+authRouter.get(
+  "/token",
+  authenticationController.handleToken.bind(authenticationController),
+);
+authRouter.get(
+  "/jwks",
+  authenticationController.JWKSHandler.bind(authenticationController),
+);
