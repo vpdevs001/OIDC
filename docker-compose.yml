@@ -1,14 +1,15 @@
 services:
-  postgresdb:
+  postgres:
     image: postgres:17
+    restart: unless-stopped
     ports:
-      - '5432:5432'
+      - "5432:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: chaicode
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: oidc_auth
     volumes:
-      - 'postgres_data:/var/lib/postgresql/data'
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  pgdata:

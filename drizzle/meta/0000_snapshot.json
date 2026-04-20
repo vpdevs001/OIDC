@@ -1,5 +1,5 @@
 {
-  "id": "83c9c4b5-782d-4d5e-b96f-a37d6812024a",
+  "id": "a621c1a7-cfb4-410d-9f80-28d06617f8a0",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -17,13 +17,19 @@
         },
         "first_name": {
           "name": "first_name",
-          "type": "varchar(45)",
+          "type": "varchar(25)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "last_name": {
           "name": "last_name",
-          "type": "varchar(45)",
+          "type": "varchar(25)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profile_image_url": {
+          "name": "profile_image_url",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -69,15 +75,7 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "users_email_unique": {
-          "name": "users_email_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
