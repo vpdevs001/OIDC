@@ -288,27 +288,34 @@ export const registerApplicationHandler = async (
   req: Request,
   res: Response,
 ) => {
-  const { displayName, appUrl, redirectUri } = req.body;
+  try {
+    const { displayName, appUrl, redirectUri } = req.body;
 
-  if (!displayName || !appUrl || !redirectUri) {
-    return res.status(400).json({
-      message: "All fields are required.",
+    if (!displayName || !appUrl || !redirectUri) {
+      return res.status(400).json({
+        message: "All fields are required.",
+      });
+    }
+
+    const clientId = crypto.randomBytes(16).toString("hex");
+    const clientSecret = crypto.randomBytes(32).toString("hex");
+
+    await db.insert(applicationsTable).values({
+      applicationName: displayName,
+      applicationURL: appUrl,
+      redirectURI: redirectUri,
+      clientId,
+      clientSecret,
+    });
+
+    return res.json({
+      clientId,
+      clientSecret,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      message: "Internal server error",
     });
   }
-
-  const clientId = crypto.randomBytes(16).toString("hex");
-  const clientSecret = crypto.randomBytes(32).toString("hex");
-
-  await db.insert(applicationsTable).values({
-    applicationName: displayName,
-    applicationURL: appUrl,
-    redirectURI: redirectUri,
-    clientId,
-    clientSecret,
-  });
-
-  return res.json({
-    clientId,
-    clientSecret,
-  });
 };
