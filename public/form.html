@@ -60,23 +60,94 @@
       button:hover {
         background-color: #0056b3;
       }
+      .result {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        white-space: pre-wrap;
+      }
+      .success {
+        background-color: #e6fffa;
+        border: 1px solid #38b2ac;
+        color: #065f46;
+      }
+      .error {
+        background-color: #ffe6e6;
+        border: 1px solid #ef4444;
+        color: #7f1d1d;
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <h1>Register Your Application</h1>
-      <form action="/register" method="post">
+
+      <form id="appForm">
         <label for="displayName">Application Display Name:</label>
-        <input type="text" id="displayName" name="displayName" required />
+        <input type="text" id="displayName" required />
 
         <label for="appUrl">Application URL:</label>
-        <input type="url" id="appUrl" name="appUrl" required />
+        <input type="url" id="appUrl" required />
 
         <label for="redirectUri">Redirection URI:</label>
-        <input type="url" id="redirectUri" name="redirectUri" required />
+        <input type="url" id="redirectUri" required />
 
         <button type="submit">Register Application</button>
       </form>
+
+      <div id="result" class="result" style="display: none"></div>
     </div>
+
+    <script>
+      const form = document.getElementById("appForm");
+      const resultDiv = document.getElementById("result");
+
+      function showResult(message, type) {
+        resultDiv.style.display = "block";
+        resultDiv.className = `result ${type}`;
+        resultDiv.textContent = message;
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const displayName = document.getElementById("displayName").value.trim();
+        const appUrl = document.getElementById("appUrl").value.trim();
+        const redirectUri = document.getElementById("redirectUri").value.trim();
+
+        if (!displayName || !appUrl || !redirectUri) {
+          showResult("All fields are required.", "error");
+          return;
+        }
+
+        try {
+          const res = await fetch("/register", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              displayName,
+              appUrl,
+              redirectUri,
+            }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            showResult(data.message || "Something went wrong.", "error");
+          } else {
+            showResult(
+              `Client ID:\n${data.clientId}\n\nClient Secret:\n${data.clientSecret}`,
+              "success",
+            );
+          }
+        } catch {
+          showResult("Network error. Please try again.", "error");
+        }
+      });
+    </script>
   </body>
 </html>

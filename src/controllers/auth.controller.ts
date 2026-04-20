@@ -174,10 +174,7 @@ export const signinHandler = async (req: Request, res: Response) => {
     })
     .where(eq(applicationsTable.clientId, clientId));
 
-  return res.json({
-    code,
-    redirectURI: application.redirectURI,
-  });
+  res.redirect(`${application.redirectURI}?code=${code}`);
 };
 
 export const signupHandler = async (req: Request, res: Response) => {
@@ -283,4 +280,35 @@ export const appInfoHandler = async (req: Request, res: Response) => {
     res.status(404).json({ message: "Application not found." });
     return;
   }
+
+  return res.json(application);
+};
+
+export const registerApplicationHandler = async (
+  req: Request,
+  res: Response,
+) => {
+  const { displayName, appUrl, redirectUri } = req.body;
+
+  if (!displayName || !appUrl || !redirectUri) {
+    return res.status(400).json({
+      message: "All fields are required.",
+    });
+  }
+
+  const clientId = crypto.randomBytes(16).toString("hex");
+  const clientSecret = crypto.randomBytes(32).toString("hex");
+
+  await db.insert(applicationsTable).values({
+    applicationName: displayName,
+    applicationURL: appUrl,
+    redirectURI: redirectUri,
+    clientId,
+    clientSecret,
+  });
+
+  return res.json({
+    clientId,
+    clientSecret,
+  });
 };

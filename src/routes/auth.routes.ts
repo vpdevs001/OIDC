@@ -3,6 +3,7 @@ import {
   appInfoHandler,
   authenticateHandler,
   jwksHandler,
+  registerApplicationHandler,
   signinHandler,
   signupHandler,
   tokenHandler,
@@ -20,6 +21,8 @@ router.get(
   "/.well-known/openid-configuration",
   wellKnownOpenIDConfigurationHandler,
 );
+
+router.post("/register", registerApplicationHandler);
 
 router.post("/o/tokens", tokenHandler);
 

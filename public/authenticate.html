@@ -391,17 +391,18 @@
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ email, password }),
+              redirect: "follow",
             },
           );
 
-          const data = await res.json().catch(() => ({}));
+          if (res.redirected) {
+            window.location.href = res.url;
+            return;
+          }
 
           if (!res.ok) {
-            showError(
-              data.message || "Something went wrong. Please try again.",
-            );
-          } else if (data.redirectURI) {
-            window.location.href = `${data.redirectURI}?code=${data.code}`;
+            const data = await res.json().catch(() => ({}));
+            showError(data.message || "Something went wrong.");
           }
         } catch {
           showError("Something went wrong. Please try again.");
