@@ -99,8 +99,9 @@ export const authenticateHandler = async (req: Request, res: Response) => {
   const clientId = req.query.client_id as string;
 
   if (!clientId) {
-    res.status(400).json({ message: "Missing client_id query parameter." });
-    return;
+    return res.status(400).json({
+      message: "Missing client_id query parameter.",
+    });
   }
 
   const [application] = await db
@@ -110,11 +111,16 @@ export const authenticateHandler = async (req: Request, res: Response) => {
     .limit(1);
 
   if (!application) {
-    res.status(404).json({ message: "Application not found." });
-    return;
+    return res.status(404).json({
+      message: "Application not found.",
+    });
   }
 
-  return res.sendFile(path.resolve("public", "authenticate.html"));
+  return res.json({
+    message: "Client is valid. Proceed to sign-in.",
+    clientId: application.clientId,
+    applicationName: application.applicationName,
+  });
 };
 
 export const signinHandler = async (req: Request, res: Response) => {
@@ -174,7 +180,10 @@ export const signinHandler = async (req: Request, res: Response) => {
     })
     .where(eq(applicationsTable.clientId, clientId));
 
-  res.redirect(`${application.redirectURI}?code=${code}`);
+  return res.json({
+    code,
+    redirectURI: application.redirectURI,
+  });
 };
 
 export const signupHandler = async (req: Request, res: Response) => {
