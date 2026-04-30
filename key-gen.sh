@@ -1,16 +1,33 @@
-#!/bin/bash
+@echo off
 
-# Set the directory where certificates will be stored
-CERT_DIR="cert"
+echo Creating cert folder...
+if not exist cert (
+mkdir cert
+)
 
-# Create the directory if it does not exist
-mkdir -p "$CERT_DIR"
+cd cert
 
-# Generate the private key (RSA 2048-bit)
-openssl genpkey -algorithm RSA -out "$CERT_DIR/private-key.pem" -pkeyopt rsa_keygen_bits:2048
+echo.
 
-# Generate the public key from the private key
-openssl rsa -in "$CERT_DIR/private-key.pem" -pubout -out "$CERT_DIR/public-key.pub"
+REM Generate private key if not exists
+if exist private.pem (
+echo private.pem already exists. Skipping...
+) else (
+echo Generating private key...
+openssl genrsa -out private.pem 2048
+)
 
-# Print success message
-echo "Keys have been generated in the $CERT_DIR/ folder."
+echo.
+
+REM Generate public key if not exists
+if exist public.pem (
+echo public.pem already exists. Skipping...
+) else (
+echo Generating public key...
+openssl rsa -in private.pem -pubout -out public.pem
+)
+
+echo.
+echo Done!
+echo Keys location: %cd%
+pause

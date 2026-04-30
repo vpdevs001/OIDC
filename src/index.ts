@@ -1,18 +1,13 @@
-import express from "express";
-import path from "node:path";
-import authRoutes from "./routes/auth.routes";
+import { createServer } from "node:http";
+import "dotenv/config";
+import createApplication from "./app/app.js";
 
-const app = express();
-const PORT = process.env.PORT ?? 8000;
+const startServer = () => {
+  const server = createServer(createApplication());
+  const PORT = process?.env?.PORT;
+  server.listen(PORT, () => {
+    console.log("Server is running at PORT", PORT);
+  });
+};
 
-app.use(express.json());
-
-app.get("/health", (req, res) =>
-  res.json({ message: "Server is healthy", healthy: true }),
-);
-
-app.use("/", authRoutes);
-
-app.listen(PORT, () => {
-  console.log(`AuthServer is running on PORT ${PORT}`);
-});
+startServer();
