@@ -201,10 +201,11 @@ export const userinfo = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 export const certs = (_: Request, res: Response) => {
-  const publicKey = fs.readFileSync(
-    path.resolve(process.cwd(), "cert", "public.pem"),
-    "utf8",
-  );
+  const publicKeyPath = process.env.PUBLIC_KEY_PATH
+    ? path.resolve(process.cwd(), process.env.PUBLIC_KEY_PATH)
+    : path.resolve(process.cwd(), "cert", "public.pem");
+
+  const publicKey = fs.readFileSync(publicKeyPath, "utf8");
   const jwk = createPublicKey(publicKey).export({
     format: "jwk",
   }) as JsonWebKey;

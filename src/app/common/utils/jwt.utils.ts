@@ -6,7 +6,9 @@ import jwt, { type SignOptions } from "jsonwebtoken";
 import fs from "node:fs";
 import path from "node:path";
 
-const privateKeyPath = path.resolve(process.cwd(), "cert", "private.pem");
+const privateKeyPath = process.env.PRIVATE_KEY_PATH
+  ? path.resolve(process.cwd(), process.env.PRIVATE_KEY_PATH)
+  : path.resolve(process.cwd(), "cert", "private.pem");
 
 const getPrivateKey = () => {
   try {

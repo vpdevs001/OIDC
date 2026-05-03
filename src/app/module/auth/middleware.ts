@@ -14,7 +14,9 @@ export interface AuthenticatedRequest extends Request {
   user?: AccessTokenPayload;
 }
 
-const publicKeyPath = path.resolve(process.cwd(), "cert", "public.pem");
+const publicKeyPath = process.env.PUBLIC_KEY_PATH
+  ? path.resolve(process.cwd(), process.env.PUBLIC_KEY_PATH)
+  : path.resolve(process.cwd(), "cert", "public.pem");
 
 const getPublicKey = () => {
   try {
